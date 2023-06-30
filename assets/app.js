@@ -1,106 +1,88 @@
-const selectBox = document.querySelector(".select-box"),
-selectBtnX = selectBox.querySelector(".options .playerX"),
-selectBtnO = selectBox.querySelector(".options .playerO"),
-playBoard = document.querySelector(".play-board"),
-players = document.querySelector(".players"),
-allBox = document.querySelectorAll("section span"),
-resultBox = document.querySelector(".result-box"),
-wonText = resultBox.querySelector(".won-text"),
-replayBtn = resultBox.querySelector("button");
-window.onload = ()=>{
-    for (let i = 0; i < allBox.length; i++) {
-       allBox[i].setAttribute("onclick", "clickedBox(this)");
+const PLAYER1 = "X";
+const PLAYER2 = "O";
+const WINNING_COMBINATIONS = [
+  [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
+  [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
+  [0, 4, 8], [2, 4, 6] // Diagonals
+];
+
+let currentPlayer = PLAYER1;
+let gameActive = true;
+let gameState = ["", "", "", "", "", "", "", "", ""];
+
+const cells = document.querySelectorAll(".cell");
+const resetButton = document.getElementById("reset");
+const player1ScoreElement = document.getElementById("player1-score");
+const player2ScoreElement = document.getElementById("player2-score");
+const scoreboardElement = document.getElementById("scoreboard");
+const messageElement = document.getElementById("message");
+
+function handleCellClick(cell, cellIndex) {
+  if (gameState[cellIndex] || !gameActive) {
+    return;
+  }
+
+  gameState[cellIndex] = currentPlayer;
+  cell.textContent = currentPlayer;
+  cell.classList.add(currentPlayer);
+
+  if (checkForWin()) {
+    endGame(false);
+  } else if (checkForDraw()) {
+    endGame(true);
+  } else {
+    switchPlayer();
+  }
+}
+
+function switchPlayer() {
+  currentPlayer = currentPlayer === PLAYER1 ? PLAYER2 : PLAYER1;
+  scoreboardElement.setAttribute("data-player", currentPlayer);
+  messageElement.textContent = `It's ${currentPlayer}'s turn`;
+}
+
+function checkForWin() {
+  for (let i = 0; i < WINNING_COMBINATIONS.length; i++) {
+    const [a, b, c] = WINNING_COMBINATIONS[i];
+    if (gameState[a] && gameState[a] === gameState[b] && gameState[a] === gameState[c]) {
+      return true;
     }
+  }
+  return false;
 }
-selectBtnX.onclick = ()=>{
-    selectBox.classList.add("hide");
-    playBoard.classList.add("show");
+
+function checkForDraw() {
+  return !gameState.includes("");
 }
-selectBtnO.onclick = ()=>{ 
-    selectBox.classList.add("hide");
-    playBoard.classList.add("show");
-    players.setAttribute("class", "players active player");
-}
-let playerXIcon = "fas fa-times",
-playerOIcon = "far fa-circle",
-playerSign = "X",
-runBot = true;
-function clickedBox(element){
-    if(players.classList.contains("player")){
-        playerSign = "O";
-        element.innerHTML = `<i class="${playerOIcon}"></i>`;
-        players.classList.remove("active");
-        element.setAttribute("id", playerSign);
-    }else{
-        element.innerHTML = `<i class="${playerXIcon}"></i>`;
-        element.setAttribute("id", playerSign);
-        players.classList.add("active");
+
+function endGame(isDraw) {
+  gameActive = false;
+  if (isDraw) {
+    messageElement.textContent = "It's a draw!";
+  } else {
+    messageElement.textContent = `${currentPlayer} wins!`;
+    if (currentPlayer === PLAYER1) {
+      player1ScoreElement.textContent++;
+    } else {
+      player2ScoreElement.textContent++;
     }
-    selectWinner();
-    element.style.pointerEvents = "none";
-    playBoard.style.pointerEvents = "none";
-    let randomTimeDelay = ((Math.random() * 1000) + 200).toFixed();
-    setTimeout(()=>{
-        bot(runBot);
-    }, randomTimeDelay);
+  }
 }
-function bot(){
-    let array = [];
-    if(runBot){
-        playerSign = "O";
-        for (let i = 0; i < allBox.length; i++) {
-            if(allBox[i].childElementCount == 0){
-                array.push(i);
-            }
-        }
-        let randomBox = array[Math.floor(Math.random() * array.length)];
-        if(array.length > 0){
-            if(players.classList.contains("player")){ 
-                playerSign = "X";
-                allBox[randomBox].innerHTML = `<i class="${playerXIcon}"></i>`;
-                allBox[randomBox].setAttribute("id", playerSign);
-                players.classList.add("active");
-            }else{
-                allBox[randomBox].innerHTML = `<i class="${playerOIcon}"></i>`;
-                players.classList.remove("active");
-                allBox[randomBox].setAttribute("id", playerSign);
-            }
-            selectWinner();
-        }
-        allBox[randomBox].style.pointerEvents = "none";
-        playBoard.style.pointerEvents = "auto";
-        playerSign = "X";
-    }
+
+function resetGame() {
+  currentPlayer = PLAYER1;
+  gameActive = true;
+  gameState = ["", "", "", "", "", "", "", "", ""];
+  cells.forEach(cell => {
+    cell.textContent = "";
+    cell.classList.remove(PLAYER1, PLAYER2);
+  });
+  scoreboardElement.setAttribute("data-player", currentPlayer);
+  messageElement.textContent = `It's ${currentPlayer}'s turn`;
 }
-function getIdVal(classname){
-    return document.querySelector(".box" + classname).id;
-}
-function checkIdSign(val1, val2, val3, sign){ 
-    if(getIdVal(val1) == sign && getIdVal(val2) == sign && getIdVal(val3) == sign){
-        return true;
-    }
-}
-function selectWinner(){
-    if(checkIdSign(1,2,3,playerSign) || checkIdSign(4,5,6, playerSign) || checkIdSign(7,8,9, playerSign) || checkIdSign(1,4,7, playerSign) || checkIdSign(2,5,8, playerSign) || checkIdSign(3,6,9, playerSign) || checkIdSign(1,5,9, playerSign) || checkIdSign(3,5,7, playerSign)){
-        runBot = false;
-        bot(runBot);
-        setTimeout(()=>{
-            resultBox.classList.add("show");
-            playBoard.classList.remove("show");
-        }, 700);
-        wonText.innerHTML = `Player <p>${playerSign}</p> won the game!`;
-    }else{
-        if(getIdVal(1) != "" && getIdVal(2) != "" && getIdVal(3) != "" && getIdVal(4) != "" && getIdVal(5) != "" && getIdVal(6) != "" && getIdVal(7) != "" && getIdVal(8) != "" && getIdVal(9) != ""){
-            runBot = false;
-            bot(runBot);
-            setTimeout(()=>{
-                resultBox.classList.add("show");
-                playBoard.classList.remove("show");
-            }, 700);
-            wonText.textContent = "Match has been drawn!";
-        }
-    }
-}
-replayBtn.onclick = ()=>{
-    window.location.reload();
-}
+
+cells.forEach((cell, index) => {
+  cell.addEventListener("click", () => handleCellClick(cell, index));
+});
+
+resetButton.addEventListener("click", resetGame);

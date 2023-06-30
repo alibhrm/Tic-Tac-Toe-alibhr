@@ -7,50 +7,35 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
 </head>
 <body>
-  <!-- select box -->
-  <div class="select-box">
-    <header>Tic Tac Toe</header>
-    <div class="content">
-      <div class="title">Select which you want to be?</div>
-      <div class="options">
-        <button class="playerX">Player (X)</button>
-        <button class="playerO">Player (O)</button>
+  <div class="container">
+    <h1>Tic Tac Toe</h1>
+    <div id="gameboard">
+      <div class="row">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+      </div>
+      <div class="row">
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+      </div>
+      <div class="row">
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
       </div>
     </div>
-  </div> 
-
-  <!-- playboard section -->
-  <div class="play-board">
-    <div class="details">
-      <div class="players">
-        <span class="Xturn">X's Turn</span>
-        <span class="Oturn">O's Turn</span>
-        <div class="slider"></div>
+    <div id="scoreboard" data-player="X">
+      <div id="player1" class="score">
+        Player 1: <span id="player1-score">0</span>
       </div>
+      <div id="player2" class="score">
+        Player 2: <span id="player2-score">0</span>
+      </div>
+      <div id="message">It's X's turn</div>
+      <button id="reset">Reset</button>
     </div>
-    <div class="play-area">
-      <section>
-        <span class="box1"></span>
-        <span class="box2"></span>
-        <span class="box3"></span>
-      </section>
-      <section>
-        <span class="box4"></span>
-        <span class="box5"></span>
-        <span class="box6"></span>
-      </section>
-      <section>
-        <span class="box7"></span>
-        <span class="box8"></span>
-        <span class="box9"></span>
-      </section>
-    </div>
-  </div>
-
-  <!-- result box -->
-  <div class="result-box">
-    <div class="won-text"></div>
-    <div class="btn"><button>Replay</button></div>
   </div>
 
   <script src="assets/app.js"></script>
